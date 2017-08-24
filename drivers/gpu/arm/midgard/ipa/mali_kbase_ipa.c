@@ -29,6 +29,7 @@
 #define dev_pm_opp_get_voltage opp_get_voltage
 #define dev_pm_opp opp
 #endif
+#include <linux/math64.h>
 
 #define KBASE_IPA_FALLBACK_MODEL_NAME "mali-simple-power-model"
 
@@ -386,9 +387,11 @@ static u32 kbase_scale_dynamic_power(const u32 c, const u32 freq,
 	/* Range (working backwards from next line): 0 < v2fc < 2^23 uW.
 	 * Must be < 2^42 to avoid overflowing the return value. */
 	const u64 v2fc = (u64) c * (u64) v2f;
+	u32 remainder;
 
 	/* Range: 0 < v2fc / 1000 < 2^13 mW */
-	return v2fc / 1000;
+	// static inline u64 div_u64_rem(u64 dividend, u32 divisor, u32 *remainder)
+	return div_u64_rem(v2fc, 1000, &remainder);
 }
 
 /**
@@ -415,9 +418,11 @@ u32 kbase_scale_static_power(const u32 c, const u32 voltage)
 	 * The result should be < 2^52 to avoid overflowing the return value.
 	 */
 	const u64 v3c_big = (u64) c * (u64) v3;
+	u32 remainder;
 
 	/* Range: 0 < v3c_big / 1000000 < 2^13 mW */
-	return v3c_big / 1000000;
+	// return v3c_big / 1000000;
+	return div_u64_rem(v3c_big, 1000000, &remainder);
 }
 
 static struct kbase_ipa_model *get_current_model(struct kbase_device *kbdev)
@@ -554,8 +559,10 @@ int kbase_get_real_power(struct devfreq *df, u32 *power,
 		struct devfreq_dev_status *status = &df->last_status;
 		unsigned long total_time = max(status->total_time, 1ul);
 		u64 busy_time = min(status->busy_time, total_time);
+		u32 remainder;
 
-		*power = ((u64) *power * (u64) busy_time) / total_time;
+		// *power = ((u64) *power * (u64) busy_time) / total_time;
+		*power = div_u64_rem(((u64) *power * (u64) busy_time), total_time, &remainder);
 	}
 
 	*power += get_static_power_locked(kbdev, model, voltage);
