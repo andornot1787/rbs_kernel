@@ -234,6 +234,36 @@
 		#clock-cells = <0>;
 	};
 
+	gpio_fan: gpio_fan {
+		compatible = "gpio-fan";
+		/*
+		 * since control pin is different on
+		 * different board, we should config
+		 * the fan control pin on board-level
+		 * dts file.
+		 */
+		/*
+		 * gpios = <&gpio1 14 1>;
+		 */
+		gpio-fan,speed-map = <0    0
+				      3000 1>;
+		operating-points-v2 = <&fan_opp_table>;
+		#cooling-cells = <2>;
+		status = "disabled";
+	};
+
+	fan_opp_table: fan-opp-table {
+		compatible = "operating-points-v2";
+		opp-100000000 {
+			opp-hz = /bits/ 64 <100000000>;
+			opp-microvolt = <950000>;
+		};
+		opp-500000000 {
+			opp-hz = /bits/ 64 <500000000>;
+			opp-microvolt = <1050000>;
+		};
+	};
+
 	amba {
 		compatible = "arm,amba-bus";
 		#address-cells = <2>;
@@ -780,6 +810,13 @@
 						<&gpu THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
 					contribution = <4096>;
 				};
+				map3 {
+					trip = <&target>;
+					cooling-device =
+						<&gpio_fan THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+					contribution = <1024>;
+				};
+
 			};
 		};
 
