@@ -505,6 +505,15 @@ static struct urb *usb_wwan_setup_urb(struct usb_serial_port *port,
 			  usb_sndbulkpipe(serial->dev, endpoint) | dir,
 			  buf, len, callback, ctx);
 
+#if 1
+	//Added by Quectel for Zero Packet
+	if (dir == USB_DIR_OUT) {
+		struct usb_device_descriptor *desc = &serial->dev->descriptor;
+		if (desc->idVendor == 0x2C7C && desc->idProduct == 0x0125)
+			urb->transfer_flags |= URB_ZERO_PACKET;
+	}
+#endif
+
 	return urb;
 }
 
