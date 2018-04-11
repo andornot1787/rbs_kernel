@@ -1,6 +1,6 @@
 /*
  *
- * (C) COPYRIGHT 2010-2016 ARM Limited. All rights reserved.
+ * (C) COPYRIGHT 2010-2017 ARM Limited. All rights reserved.
  *
  * This program is free software and is provided to you under the terms of the
  * GNU General Public License version 2 as published by the Free Software
@@ -1265,6 +1265,10 @@ static void kbase_pm_hw_issues_detect(struct kbase_device *kbdev)
 			kbdev->hw_quirks_sc |= SC_LS_ALLOW_ATTR_TYPES;
 	}
 
+	if (!kbdev->hw_quirks_sc)
+		kbdev->hw_quirks_sc = kbase_reg_read(kbdev,
+				GPU_CONTROL_REG(SHADER_CONFIG), NULL);
+
 	kbdev->hw_quirks_tiler = kbase_reg_read(kbdev,
 			GPU_CONTROL_REG(TILER_CONFIG), NULL);
 
@@ -1293,7 +1297,7 @@ static void kbase_pm_hw_issues_detect(struct kbase_device *kbdev)
 		kbdev->hw_quirks_mmu |= L2_MMU_CONFIG_ALLOW_SNOOP_DISPARITY;
 	}
 
-	kbdev->hw_quirks_jm = JM_CONFIG_UNUSED;
+	kbdev->hw_quirks_jm = 0;
 	/* Only for T86x/T88x-based products after r2p0 */
 	if (prod_id >= 0x860 && prod_id <= 0x880 && major >= 2) {
 
@@ -1315,7 +1319,7 @@ static void kbase_pm_hw_issues_detect(struct kbase_device *kbdev)
 		}
 
 		/* Aggregate to one integer. */
-		kbdev->hw_quirks_jm = (jm_values[0] ?
+		kbdev->hw_quirks_jm |= (jm_values[0] ?
 				JM_TIMESTAMP_OVERRIDE : 0);
 		kbdev->hw_quirks_jm |= (jm_values[1] ?
 				JM_CLOCK_GATE_OVERRIDE : 0);
@@ -1338,11 +1342,15 @@ static void kbase_pm_hw_issues_detect(struct kbase_device *kbdev)
 		 */
 		if (coherency_features ==
 				COHERENCY_FEATURE_BIT(COHERENCY_ACE)) {
-			kbdev->hw_quirks_jm =
+			kbdev->hw_quirks_jm |=
 				(COHERENCY_ACE_LITE | COHERENCY_ACE) <<
 				JM_FORCE_COHERENCY_FEATURES_SHIFT;
 		}
 	}
+
+	if (!kbdev->hw_quirks_jm)
+		kbdev->hw_quirks_jm = kbase_reg_read(kbdev,
+				GPU_CONTROL_REG(JM_CONFIG), NULL);
 
 #ifdef CONFIG_MALI_CORESTACK
 #define MANUAL_POWER_CONTROL ((u32)(1 << 8))
@@ -1352,9 +1360,8 @@ static void kbase_pm_hw_issues_detect(struct kbase_device *kbdev)
 
 static void kbase_pm_hw_issues_apply(struct kbase_device *kbdev)
 {
-	if (kbdev->hw_quirks_sc)
-		kbase_reg_write(kbdev, GPU_CONTROL_REG(SHADER_CONFIG),
-				kbdev->hw_quirks_sc, NULL);
+	kbase_reg_write(kbdev, GPU_CONTROL_REG(SHADER_CONFIG),
+			kbdev->hw_quirks_sc, NULL);
 
 	kbase_reg_write(kbdev, GPU_CONTROL_REG(TILER_CONFIG),
 			kbdev->hw_quirks_tiler, NULL);
@@ -1362,10 +1369,8 @@ static void kbase_pm_hw_issues_apply(struct kbase_device *kbdev)
 	kbase_reg_write(kbdev, GPU_CONTROL_REG(L2_MMU_CONFIG),
 			kbdev->hw_quirks_mmu, NULL);
 
-
-	if (kbdev->hw_quirks_jm != JM_CONFIG_UNUSED)
-		kbase_reg_write(kbdev, GPU_CONTROL_REG(JM_CONFIG),
-				kbdev->hw_quirks_jm, NULL);
+	kbase_reg_write(kbdev, GPU_CONTROL_REG(JM_CONFIG),
+			kbdev->hw_quirks_jm, NULL);
 
 }
 
