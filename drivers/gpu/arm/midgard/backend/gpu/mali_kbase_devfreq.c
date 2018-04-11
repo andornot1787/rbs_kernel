@@ -22,9 +22,6 @@
 #include <mali_kbase_tlstream.h>
 #include <mali_kbase_config_defaults.h>
 #include <backend/gpu/mali_kbase_pm_internal.h>
-#ifdef CONFIG_DEVFREQ_THERMAL
-#include <backend/gpu/mali_kbase_power_model_simple.h>
-#endif
 
 #include <linux/clk.h>
 #include <linux/devfreq.h>
@@ -159,7 +156,7 @@ static int kbase_devfreq_init_freq_table(struct kbase_device *kbdev,
 {
 	int count;
 	int i = 0;
-	unsigned long freq = 0;
+	unsigned long freq;
 	struct dev_pm_opp *opp;
 
 	rcu_read_lock();
@@ -176,8 +173,8 @@ static int kbase_devfreq_init_freq_table(struct kbase_device *kbdev,
 		return -ENOMEM;
 
 	rcu_read_lock();
-	for (i = 0; i < count; i++, freq++) {
-		opp = dev_pm_opp_find_freq_ceil(kbdev->dev, &freq);
+	for (i = 0, freq = ULONG_MAX; i < count; i++, freq--) {
+		opp = dev_pm_opp_find_freq_floor(kbdev->dev, &freq);
 		if (IS_ERR(opp))
 			break;
 
@@ -257,29 +254,22 @@ int kbase_devfreq_init(struct kbase_device *kbdev)
 	rcu_read_unlock();
 	kbdev->devfreq->last_status.current_frequency = opp_rate;
 #ifdef CONFIG_DEVFREQ_THERMAL
-	err = kbase_power_model_simple_init(kbdev);
-	if (err && err != -ENODEV && err != -EPROBE_DEFER) {
-		dev_err(kbdev->dev,
-			"Failed to initialize simple power model (%d)\n",
-			err);
+	err = kbase_ipa_model_init(kbdev);
+	if (err) {
+		dev_err(kbdev->dev, "IPA initialization failed\n");
 		goto cooling_failed;
 	}
-	if (err == -EPROBE_DEFER)
+
+	kbdev->devfreq_cooling = of_devfreq_cooling_register_power(
+			kbdev->dev->of_node,
+			kbdev->devfreq,
+			&power_model_ops);
+	if (IS_ERR_OR_NULL(kbdev->devfreq_cooling)) {
+		err = PTR_ERR(kbdev->devfreq_cooling);
+		dev_err(kbdev->dev,
+			"Failed to register cooling device (%d)\n",
+			err);
 		goto cooling_failed;
-	if (err != -ENODEV) {
-		kbdev->devfreq_cooling = of_devfreq_cooling_register_power(
-				kbdev->dev->of_node,
-				kbdev->devfreq,
-				&power_model_simple_ops);
-		if (IS_ERR_OR_NULL(kbdev->devfreq_cooling)) {
-			err = PTR_ERR(kbdev->devfreq_cooling);
-			dev_err(kbdev->dev,
-				"Failed to register cooling device (%d)\n",
-				err);
-			goto cooling_failed;
-		}
-	} else {
-		err = 0;
 	}
 	I("success initing power_model_simple.");
 #endif
@@ -308,6 +298,8 @@ void kbase_devfreq_term(struct kbase_device *kbdev)
 #ifdef CONFIG_DEVFREQ_THERMAL
 	if (kbdev->devfreq_cooling)
 		devfreq_cooling_unregister(kbdev->devfreq_cooling);
+
+	kbase_ipa_model_term(kbdev);
 #endif
 
 	devfreq_unregister_opp_notifier(kbdev->dev, kbdev->devfreq);
