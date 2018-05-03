@@ -172,15 +172,8 @@ endif
 
 LOGO := $(notdir $(wildcard $(srctree)/logo.bmp))
 LOGO_KERNEL := $(notdir $(wildcard $(srctree)/logo_kernel.bmp))
-BOOT_MENU := $(notdir $(wildcard $(srctree)/bootmenu/*.bmp))
 %.img: rockchip/%.dtb kernel.img $(LOGO) $(LOGO_KERNEL)
 	$(Q) if [ -f $(srctree)/$(LOGO) -a "$(srctree)" != "$(objtree)" ]; then cp -a $(srctree)/$(LOGO) $(objtree)/; fi
 	$(Q) if [ -f $(srctree)/$(LOGO_KERNEL) -a "$(srctree)" != "$(objtree)" ]; then cp -a $(srctree)/$(LOGO_KERNEL) $(objtree)/; fi
-	$(Q) (for name in $(BOOT_MENU); do \
-			if [ -f $(srctree)/bootmenu/$$name -a "$(srctree)" != "$(objtree)" ]; \
-				then \
-				cp -a $(srctree)/bootmenu/$$name $(objtree)/; \
-			fi; \
-		 done)
-	$(Q)$(srctree)/scripts/resource_tool $(objtree)/arch/arm64/boot/dts/rockchip/$*.dtb $(LOGO) $(LOGO_KERNEL) $(srctree)/bootmenu/*.bmp
-	@echo '  Image:  resource.img (with $*.dtb $(LOGO) $(LOGO_KERNEL) $(BOOT_MENU)) is ready'
+	$(Q)$(srctree)/scripts/resource_tool $(objtree)/arch/arm64/boot/dts/rockchip/$*.dtb $(LOGO) $(LOGO_KERNEL)
+	@echo '  Image:  resource.img (with $*.dtb $(LOGO) $(LOGO_KERNEL)) is ready'
