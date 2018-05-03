@@ -176,7 +176,7 @@ BOOT_MENU := $(notdir $(wildcard $(srctree)/bootmenu/*.bmp))
 %.img: rockchip/%.dtb kernel.img $(LOGO) $(LOGO_KERNEL)
 	$(Q) if [ -f $(srctree)/$(LOGO) -a "$(srctree)" != "$(objtree)" ]; then cp -a $(srctree)/$(LOGO) $(objtree)/; fi
 	$(Q) if [ -f $(srctree)/$(LOGO_KERNEL) -a "$(srctree)" != "$(objtree)" ]; then cp -a $(srctree)/$(LOGO_KERNEL) $(objtree)/; fi
-	$(Q) if [ -d $(srctree)/bootmenu ]; then cp -ar $(srctree)/bootmenu/*.bmp $(objtree)/;fi
+	$(Q) if [ -d $(srctree)/bootmenu -a "$(srctree)" != "$(objtree)" ]; then cp -ar $(srctree)/bootmenu/*.bmp $(objtree)/;fi
 	$(Q) if [ -d $(srctree)/bootmenu ]; then \
 		$(srctree)/scripts/resource_tool $(objtree)/arch/arm64/boot/dts/rockchip/$*.dtb $(LOGO) $(LOGO_KERNEL) $(srctree)/bootmenu/*.bmp; \
 	else \
