@@ -46,24 +46,13 @@
 / {
 	model = "Rockchip RK3399 Board For PC (Dolphin)";
 	compatible = "rockchip-dolphin-pc","rockchip,rk3399-dolphin";
-};
 
-/*
-&cdn_dp {
-	status = "okay";
-	extcon = <&fusb0>;
-};
-*/
-
-&edp {
-	status = "okay";
-	force-hpd;
 	panel: panel {
 		status = "okay";
 		compatible = "simple-panel";
 		prepare-delay-ms = <20>;
 		enable-delay-ms = <20>;
-
+	
 		port {
 			panel_in: endpoint {
 				remote-endpoint = <&edp_out>;
@@ -72,24 +61,29 @@
 
 		display-timings {
 			native-mode = <&edp_timing>;
-
+	
 			edp_timing: edp-timing {
-				clock-frequency = <200000000>;
-				hactive = <1536>;
-				vactive = <2048>;
-				hfront-porch = <12>;
-				hsync-len = <16>;
-				hback-porch = <48>;
-				vfront-porch = <8>;
-				vsync-len = <4>;
-				vback-porch = <8>;
-				hsync-active = <0>;
-				vsync-active = <0>;
+				clock-frequency = <74250000>;
+				hactive = <1280>;
+				vactive = <720>;
+				hfront-porch = <110>;
+				hsync-len = <40>;
+				hback-porch = <220>;
+				vfront-porch = <5>;
+				vsync-len = <5>;
+				vback-porch = <20>;
+				hsync-active = <1>;
+				vsync-active = <1>;
 				de-active = <0>;
 				pixelclk-active = <0>;
 			};
 		};
 	};
+};
+
+&edp {
+	status = "okay";
+	force-hpd;
 	ports {
 		port@1 {
 			edp_out: endpoint {
@@ -97,6 +91,10 @@
 			};
 		};
 	};
+};
+
+&route_edp {
+	status = "okay";
 };
 
 &edp_in_vopl {
