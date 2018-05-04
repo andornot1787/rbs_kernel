@@ -172,6 +172,15 @@
 	status = "okay";
 };
 
+&gmac {
+	clock_in_out = "output";
+	status = "okay";
+	fixed-link {
+		speed = <1000>;
+		full-duplex;
+	};
+};
+
 &pcie0 {
 	ep-gpios = <&gpio2 26 GPIO_ACTIVE_HIGH>;
 	num-lanes = <4>;
