@@ -140,6 +140,38 @@
 	status = "okay";
 };
 
+&i2c4 {
+	status = "okay";
+	tc358749x: tc358749x@0f {
+		compatible = "toshiba,tc358749x";
+		reg = <0x0f>;
+		power-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>;
+		stanby-gpios = <&gpio3 30 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio2  28 GPIO_ACTIVE_HIGH>;
+		int-gpios = <&gpio3 29 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&hdmiin_gpios>;
+		status = "disabled";
+	};
+
+};
+
+&isp0 {
+	status = "okay";
+};
+
+&isp0_mmu {
+	status = "okay";
+};
+
+&isp1 {
+	status = "okay";
+};
+
+&isp1_mmu {
+	status = "okay";
+};
+
 &pcie0 {
 	ep-gpios = <&gpio2 26 GPIO_ACTIVE_HIGH>;
 	num-lanes = <4>;
@@ -156,6 +188,15 @@
 	pcie {
 		pcie_ep: pcie-ep {
 			rockchip,pins = <2 26 RK_FUNC_GPIO &pcfg_pull_up>;
+		};
+	};
+	hdmiin {
+		hdmiin_gpios: hdmiin_gpios {
+			rockchip,pins =
+				<4 5 RK_FUNC_GPIO &pcfg_pull_up>,
+				<2 28 RK_FUNC_GPIO &pcfg_pull_none>,
+				<3 29 RK_FUNC_GPIO &pcfg_pull_none>,
+				<3 30 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
 };
