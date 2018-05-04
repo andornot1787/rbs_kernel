@@ -286,9 +286,10 @@ int stmmac_mdio_register(struct net_device *ndev)
 
 	if (!found) {
 		pr_warn("%s: No PHY found\n", ndev->name);
-		mdiobus_unregister(new_bus);
-		mdiobus_free(new_bus);
-		return -ENODEV;
+	//	mdiobus_unregister(new_bus);
+	//	mdiobus_free(new_bus);
+	//	return -ENODEV;
+		goto no_phy;
 	}
 
 	priv->mii = new_bus;
@@ -298,6 +299,10 @@ int stmmac_mdio_register(struct net_device *ndev)
 bus_register_fail:
 	mdiobus_free(new_bus);
 	return err;
+no_phy:
+	priv->mii = new_bus;
+	netif_carrier_on(ndev);
+	return 0;
 }
 
 /**
