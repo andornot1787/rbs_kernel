@@ -45,7 +45,7 @@
 
 / {
 	model = "Rockchip RK3399 Board For CPU1 (CRS01)";
-	compatible = "rockchip-crs01-cpu1","rockchip,rk3399-crs01";
+	compatible = "rockchip-crs02","rockchip,rk3399-crs02";
 	fiq_debugger: fiq-debugger {
 		compatible = "rockchip,fiq-debugger";
 		rockchip,serial-id = <2>;
