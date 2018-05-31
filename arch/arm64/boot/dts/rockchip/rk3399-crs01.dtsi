@@ -42,12 +42,49 @@
 #include <dt-bindings/pwm/pwm.h>
 #include <dt-bindings/input/input.h>
 #include "rk3399.dtsi"
-#include "rk3399-android.dtsi"
+#include "rk3399-linux.dtsi"
 #include "rk3399-opp.dtsi"
 
 / {
 	compatible = "rockchip,rk3399-crs01","rockchip,rk3399";
+	rt5651-sound {
+		status="okay";
+                compatible = "simple-audio-card";
+                simple-audio-card,format = "i2s";
+                simple-audio-card,name = "realtek,rt5651-codec";
+                simple-audio-card,mclk-fs = <256>;
+                simple-audio-card,widgets =
+                        "Microphone", "Mic Jack",
+                        "Headphone", "Headphone Jack";
+                simple-audio-card,routing =
+                        "Mic Jack", "MICBIAS1",
+                        "IN1P", "Mic Jack",
+                        "Headphone Jack", "HPOL",
+                        "Headphone Jack", "HPOR";
+                simple-audio-card,cpu {
+                        sound-dai = <&i2s0>;
+                };
+                simple-audio-card,codec {
+                        sound-dai = <&rt5651>;
+                };
+        };
+        spdif-sound {
+                status = "disabled";
+                compatible = "simple-audio-card";
+                simple-audio-card,name = "ROCKCHIP,SPDIF";
+                simple-audio-card,cpu {
+                        sound-dai = <&spdif>;
+                };
+                simple-audio-card,codec {
+                        sound-dai = <&spdif_out>;
+                };
+        };
 
+        spdif_out: spdif-out {
+                status = "okay";
+                compatible = "linux,spdif-dit";
+                #sound-dai-cells = <0>;
+        };
 	vcc5v0_sys: vcc5v0-sys {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0_sys";
@@ -124,6 +161,23 @@
 	};
 };
 
+&i2c1 {
+        status = "okay";
+        i2c-scl-rising-time-ns = <300>;
+        i2c-scl-falling-time-ns = <15>;
+
+        rt5651: rt5651@1a {
+                #sound-dai-cells = <0>;
+                compatible = "rockchip,rt5651";
+                reg = <0x1a>;
+                clocks = <&cru SCLK_I2S_8CH_OUT>;
+                clock-names = "mclk";
+                pinctrl-names = "default";
+                pinctrl-0 = <&i2s_8ch_mclk>;
+                spk-con-gpio = <&gpio0 11 GPIO_ACTIVE_HIGH>;
+                hp-det-gpio = <&gpio4 28 GPIO_ACTIVE_LOW>;
+        };
+};
 &emmc_phy {
 	status = "okay";
 };
@@ -437,7 +491,7 @@
 	//assigned-clocks = <&cru SCLK_RMII_SRC>;
 	//assigned-clock-parents = <&clkin_gmac>;
 	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&rgmii_pins>;
+	pinctrl-0 = <&rgmii_crs01_pins>;
 	//pinctrl-1 = <&rgmii_sleep_pins>;
 	tx_delay = <0x28>;
 	rx_delay = <0x11>;
@@ -473,6 +527,39 @@
 			rockchip,pins =
 				<1 14 RK_FUNC_GPIO &pcfg_pull_down>;
 		};
+	};
+	rgmii_crs01_pins: rgmii-crs01-pins {
+		rockchip,pins =
+		/* mac_txclk */
+		<3 17 RK_FUNC_1 &pcfg_pull_none_13ma>,
+		/* mac_rxclk */
+		<3 14 RK_FUNC_1 &pcfg_pull_none>,
+		/* mac_mdio */
+		<3 13 RK_FUNC_1 &pcfg_pull_none>,
+		/* mac_txen */
+		<3 12 RK_FUNC_1 &pcfg_pull_none_13ma>,
+		/* mac_clk */
+		//<3 11 RK_FUNC_1 &pcfg_pull_none>,////This pin is used for i2c5
+		/* mac_rxdv */
+		<3 9 RK_FUNC_1 &pcfg_pull_none>,
+		/* mac_mdc */
+		<3 8 RK_FUNC_1 &pcfg_pull_none>,
+		/* mac_rxd1 */
+		<3 7 RK_FUNC_1 &pcfg_pull_none>,
+		/* mac_rxd0 */
+		<3 6 RK_FUNC_1 &pcfg_pull_none>,
+		/* mac_txd1 */
+		<3 5 RK_FUNC_1 &pcfg_pull_none_13ma>,
+		/* mac_txd0 */
+		<3 4 RK_FUNC_1 &pcfg_pull_none_13ma>,
+		/* mac_rxd3 */
+		<3 3 RK_FUNC_1 &pcfg_pull_none>,
+		/* mac_rxd2 */
+		<3 2 RK_FUNC_1 &pcfg_pull_none>,
+		/* mac_txd3 */
+		<3 1 RK_FUNC_1 &pcfg_pull_none_13ma>,
+		/* mac_txd2 */
+		<3 0 RK_FUNC_1 &pcfg_pull_none_13ma>;
 	};
 };
 
