@@ -56,6 +56,23 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&uart2c_xfer>;
 	};
+
+	hdmi_codec: hdmi-codec {
+		status="okay";
+		compatible = "simple-audio-card";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,mclk-fs = <256>;
+		simple-audio-card,name = "HDMI-CODEC";
+
+		simple-audio-card,cpu {
+			sound-dai = <&i2s2>;
+		};
+
+		simple-audio-card,codec {
+			sound-dai = <&hdmi>;
+		};
+	};
+
 	vccadc_ref: vccadc-ref {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc1v8_sys";
@@ -127,8 +144,12 @@
 /* HDMI OUT sound */
 &i2s2 {
 	status = "okay";
+	#sound-dai-cells = <0>;
 };
-
+&i2s0 {
+        status = "okay";
+	#sound-dai-cells = <0>;
+};
 &vopb {
 	status = "okay";
 };
@@ -248,6 +269,12 @@
 	status = "okay";
 };
 
+&hdmi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	#sound-dai-cells = <0>;
+	status = "okay";
+};
 
 &cif_isp0 {
 	rockchip,camera-modules-attached = <&camera1>;
