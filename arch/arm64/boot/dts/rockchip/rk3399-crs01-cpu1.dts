@@ -46,6 +46,16 @@
 / {
 	model = "Rockchip RK3399 Board For CPU1 (CRS01)";
 	compatible = "rockchip-crs01-cpu1","rockchip,rk3399-crs01";
+	fiq_debugger: fiq-debugger {
+		compatible = "rockchip,fiq-debugger";
+		rockchip,serial-id = <2>;
+		rockchip,signal-irq = <182>;
+		rockchip,wake-irq = <0>;
+		rockchip,irq-mode-enable = <1>;  /* If enable uart uses irq instead of fiq */
+		rockchip,baudrate = <1500000>;  /* Only 115200 and 1500000 */
+		pinctrl-names = "default";
+		pinctrl-0 = <&uart2c_xfer>;
+	};
 };
 &rga{
 	status="okay";
@@ -56,9 +66,6 @@
 	status = "okay";
 };
 
-&hdmi_dp_sound {
-	status = "okay";
-};
 
 /* External audio output */
 &i2s1 {
@@ -159,17 +166,11 @@
 
 };
 
-&isp0 {
-	status = "okay";
-};
 
 &isp0_mmu {
 	status = "okay";
 };
 
-&isp1 {
-	status = "okay";
-};
 
 &isp1_mmu {
 	status = "okay";
