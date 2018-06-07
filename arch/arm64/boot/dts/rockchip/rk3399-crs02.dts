@@ -302,7 +302,7 @@
 };
 
 &pcie0 {
-	ep-gpios = <&gpio2 26 GPIO_ACTIVE_HIGH>;
+	ep-gpios = <&gpio3 15 GPIO_ACTIVE_HIGH>;
 	num-lanes = <4>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pcie_clkreqn_cpm &pcie_ep>;
@@ -316,7 +316,7 @@
 &pinctrl {
 	pcie {
 		pcie_ep: pcie-ep {
-			rockchip,pins = <2 26 RK_FUNC_GPIO &pcfg_pull_up>;
+			rockchip,pins = <3 15 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 	};
 	hdmiin {
