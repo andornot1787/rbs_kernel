@@ -46,7 +46,7 @@
 #include "rk3399-opp.dtsi"
 
 / {
-	compatible = "rockchip,rk3399-crs02","rockchip,rk3399";
+	compatible = "rockchip,rk3399-crs01","rockchip,rk3399";
 	rt5651-sound {
 		status="okay";
                 compatible = "simple-audio-card";
@@ -307,7 +307,7 @@
 				};
 			};
 
-			/* Ldo1: Unused on crs02 board */
+			/* Ldo1: Unused on crs01 board */
 			vcc1v8_unused1: LDO_REG1 {
 				regulator-name = "vcc1v8_dvp";
 				regulator-min-microvolt = <1800000>;
@@ -356,7 +356,7 @@
 				};
 			};
 
-			/* Ldo5: Unused on crs02 board */
+			/* Ldo5: Unused on crs01 board */
 			vcc1v8_unused2: LDO_REG5 {
 				regulator-name = "vcca3v0_codec";
 				regulator-min-microvolt = <1800000>;
@@ -405,7 +405,7 @@
 				};
 			};
 
-			/* Switch1: Unused on crs02 board */
+			/* Switch1: Unused on crs01 board */
 			vcc3v3_s3: SWITCH_REG1 {
 				regulator-name = "vcc3v3_s3";
 				regulator-always-on;
@@ -491,7 +491,7 @@
 	//assigned-clocks = <&cru SCLK_RMII_SRC>;
 	//assigned-clock-parents = <&clkin_gmac>;
 	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&rgmii_crs02_pins>;
+	pinctrl-0 = <&rgmii_crs01_pins>;
 	//pinctrl-1 = <&rgmii_sleep_pins>;
 	tx_delay = <0x28>;
 	rx_delay = <0x11>;
@@ -528,7 +528,7 @@
 				<1 14 RK_FUNC_GPIO &pcfg_pull_down>;
 		};
 	};
-	rgmii_crs02_pins: rgmii-crs02-pins {
+	rgmii_crs01_pins: rgmii-crs01-pins {
 		rockchip,pins =
 		/* mac_txclk */
 		<3 17 RK_FUNC_1 &pcfg_pull_none_13ma>,
