@@ -47,6 +47,9 @@
 	model = "Rockchip RK3399 Board For CPU1 (CRS01)";
 	compatible = "rockchip-crs01-cpu1","rockchip,rk3399-crs01";
 };
+&rga{
+	status="okay";
+};
 
 /* HDMI OUT sound */
 &i2s2 {
