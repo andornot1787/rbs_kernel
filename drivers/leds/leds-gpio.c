@@ -70,8 +70,9 @@ static void gpio_led_set(struct led_classdev *led_cdev,
 			led_dat->platform_gpio_blink_set(led_dat->gpiod, level,
 							 NULL, NULL);
 			led_dat->blinking = 0;
-		} else
+		} else {
 			gpiod_set_value(led_dat->gpiod, level);
+		}
 	}
 }
 
@@ -243,13 +244,62 @@ static const struct of_device_id of_gpio_leds_match[] = {
 };
 
 MODULE_DEVICE_TABLE(of, of_gpio_leds_match);
+#define CRS_LED 1
+#if CRS_LED
+#include <linux/delay.h>
+static ssize_t show_led_gpio (struct device *dev,			
+    struct device_attribute *attr, char *buf)
+{  
+    return snprintf(buf, 32, "echo 0/1 time_ms > led_gpio\n");
+}
 
+static ssize_t store_led_gpio(struct device *dev,
+ 	struct device_attribute *attr, const char *buf, size_t count)
+{
+ 	int num,i,ret,on_off=0,time_ms=0;
+	struct platform_device *pdev =to_platform_device(dev);
+	struct gpio_leds_priv *priv = platform_get_drvdata(pdev);
+	num=simple_strtoul(buf, NULL, 10);
+	if (num < 0) {
+		printk(KERN_ERR  "%s,%d,simple_strtoul failed! buf is %s\n",__FUNCTION__,__LINE__,buf);
+		return -EINVAL;
+	}
+	ret = sscanf(buf, " %d %d", &on_off, &time_ms);
+	if (ret != 2) {
+		printk(KERN_ERR  "%s,%d,sscanf failed! buf is %s\n",__FUNCTION__,__LINE__,buf);
+		return -EINVAL;
+	}
+	for (i = 0; i < priv->num_leds; i++) {
+		struct gpio_led_data *led = &priv->leds[i];
+		if(on_off==1) {
+			gpio_led_set(&led->cdev, LED_OFF);
+			mdelay(time_ms);
+			gpio_led_set(&led->cdev, LED_FULL);
+		} else {
+			gpio_led_set(&led->cdev, LED_FULL);
+			mdelay(time_ms);
+			gpio_led_set(&led->cdev, LED_OFF);
+		}
+	}
+	return count;
+}
+
+const struct device_attribute led_control_attrs = {
+	.attr = {
+		.name = "led_gpio",
+		.mode = 0644,
+	},
+	.show = show_led_gpio,
+	.store = store_led_gpio,
+};
+
+#endif
 static int gpio_led_probe(struct platform_device *pdev)
 {
 	struct gpio_led_platform_data *pdata = dev_get_platdata(&pdev->dev);
 	struct gpio_leds_priv *priv;
 	int i, ret = 0;
-
+	
 	if (pdata && pdata->num_leds) {
 		priv = devm_kzalloc(&pdev->dev,
 				sizeof_gpio_leds_priv(pdata->num_leds),
@@ -274,9 +324,10 @@ static int gpio_led_probe(struct platform_device *pdev)
 		if (IS_ERR(priv))
 			return PTR_ERR(priv);
 	}
-
 	platform_set_drvdata(pdev, priv);
-
+#if CRS_LED
+	device_create_file(&pdev->dev, &led_control_attrs);
+#endif
 	return 0;
 }
 
