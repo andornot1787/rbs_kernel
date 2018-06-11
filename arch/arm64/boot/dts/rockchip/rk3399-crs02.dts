@@ -140,6 +140,16 @@
 		rockchip,camera-module-mclk-name = "clk_cif_out";
 		rockchip,camera-module-mipi-dphy-index = <0>;
 	};
+        hym8563: hym8563@51 {
+		status ="okay";
+		//compatible ="rtc,hym8563";
+                compatible = "nxp,pcf8563";
+                reg = <0x51>;
+                #clock-cells = <0>;
+                clock-frequency = <32768>;
+                clock-output-names = "xin32k";
+                /* rtc_int is not connected */
+        };
 };
 /* HDMI OUT sound */
 &i2s2 {
