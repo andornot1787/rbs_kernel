@@ -192,7 +192,9 @@
 &emmc_phy {
 	status = "okay";
 };
-
+&watchdog {
+	status="disabled";
+};
 &sdhci {
 	bus-width = <8>;
 	mmc-hs400-1_8v;
