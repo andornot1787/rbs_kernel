@@ -271,11 +271,11 @@ static ssize_t store_led_gpio(struct device *dev,
 	}
 	for (i = 0; i < priv->num_leds; i++) {
 		struct gpio_led_data *led = &priv->leds[i];
-		if(on_off==1) {
+		if(on_off==0) {//off-->on
 			gpio_led_set(&led->cdev, LED_OFF);
 			mdelay(time_ms);
 			gpio_led_set(&led->cdev, LED_FULL);
-		} else {
+		} else {// on-->off
 			gpio_led_set(&led->cdev, LED_FULL);
 			mdelay(time_ms);
 			gpio_led_set(&led->cdev, LED_OFF);
