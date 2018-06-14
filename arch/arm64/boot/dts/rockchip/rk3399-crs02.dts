@@ -319,10 +319,6 @@
 	status = "okay";
 };
 
-&fiq_debugger {
-	rockchip,baudrate = <115200>;
-};
-
 &pinctrl {
 	pcie {
 		pcie_ep: pcie-ep {
