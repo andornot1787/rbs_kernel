@@ -156,6 +156,15 @@ struct vpu_task_info {
 	 */
 	int reg_len;
 
+
+
+ 	/*
+	 * soft reset register
+	 * special register for soft reset
+	 * valid on vpu & vpu2 & rkv
+	 */
+	int reg_reset;
+
 	/*
 	 * direct mv register
 	 * special offset scale, offset multiply by 16
@@ -199,6 +208,9 @@ struct vpu_task_info {
 
 	/* task error bit mask for irq register */
 	u32 error_mask;
+
+	/* task reset bit mask for reset register */
+	u32 reset_mask;
 
 	enum FORMAT_TYPE (*get_fmt)(u32 *regs);
 };
