@@ -1801,7 +1801,7 @@ static int rt5651_i2c_probe(struct i2c_client *i2c,
 {
 	struct rt5651_platform_data *pdata = dev_get_platdata(&i2c->dev);
 	struct rt5651_priv *rt5651;
-	int ret;
+	int ret,i=0;
 
 	rt5651 = devm_kzalloc(&i2c->dev, sizeof(*rt5651),
 				GFP_KERNEL);
@@ -1820,14 +1820,22 @@ static int rt5651_i2c_probe(struct i2c_client *i2c,
 			ret);
 		return ret;
 	}
-
-	regmap_read(rt5651->regmap, RT5651_DEVICE_ID, &ret);
-	if (ret != RT5651_DEVICE_ID_VALUE) {
+	for (i=0;i<5;i++) {
+		regmap_read(rt5651->regmap, RT5651_DEVICE_ID, &ret);
+		if (ret != RT5651_DEVICE_ID_VALUE) {
+			dev_err(&i2c->dev,
+				"Device with ID register %#x is not rt5651\n", ret);
+			//return -ENODEV;
+		} else {
+			break;
+		}
+	}
+	if (i==5) {
 		dev_err(&i2c->dev,
-			"Device with ID register %#x is not rt5651\n", ret);
+				"csq rt5651 fail 5 time,reboot\n");
+		panic("rt5651");
 		return -ENODEV;
 	}
-
 	regmap_write(rt5651->regmap, RT5651_RESET, 0);
 
 	ret = regmap_register_patch(rt5651->regmap, init_list,
