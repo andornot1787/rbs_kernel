@@ -65,7 +65,7 @@
 		rockchip,pvtm-ref-temp = <41>;
 		rockchip,pvtm-temp-prop = <115 66>;
 		rockchip,pvtm-thermal-zone = "soc-thermal";
-
+/*
 		opp-408000000 {
 			opp-hz = /bits/ 64 <408000000>;
 			opp-microvolt = <800000>;
@@ -103,6 +103,7 @@
 			opp-microvolt-L3 = <850000>;
 			clock-latency-ns = <40000>;
 		};
+*/
 		opp-1200000000 {
 			opp-hz = /bits/ 64 <1200000000>;
 			opp-microvolt = <1000000>;
@@ -112,6 +113,7 @@
 			opp-microvolt-L3 = <925000>;
 			clock-latency-ns = <40000>;
 		};
+/*
 		opp-1416000000 {
 			opp-hz = /bits/ 64 <1416000000>;
 			opp-microvolt = <1125000>;
@@ -121,6 +123,7 @@
 			opp-microvolt-L3 = <1050000>;
 			clock-latency-ns = <40000>;
 		};
+*/
 	};
 
 	cluster1_opp: opp-table1 {
@@ -145,7 +148,7 @@
 		rockchip,pvtm-ref-temp = <41>;
 		rockchip,pvtm-temp-prop = <71 35>;
 		rockchip,pvtm-thermal-zone = "soc-thermal";
-
+/*
 		opp-408000000 {
 			opp-hz = /bits/ 64 <408000000>;
 			opp-microvolt = <800000>;
@@ -183,6 +186,7 @@
 			opp-microvolt-L3 = <850000>;
 			clock-latency-ns = <40000>;
 		};
+*/
 		opp-1200000000 {
 			opp-hz = /bits/ 64 <1200000000>;
 			opp-microvolt = <950000>;
@@ -192,6 +196,7 @@
 			opp-microvolt-L3 = <875000>;
 			clock-latency-ns = <40000>;
 		};
+/*
 		opp-1416000000 {
 			opp-hz = /bits/ 64 <1416000000>;
 			opp-microvolt = <1025000>;
@@ -219,6 +224,7 @@
 			opp-microvolt-L3 = <1125000>;
 			clock-latency-ns = <40000>;
 		};
+*/
 	};
 
 	gpu_opp_table: opp-table2 {
